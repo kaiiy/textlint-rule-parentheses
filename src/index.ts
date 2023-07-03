@@ -5,6 +5,13 @@ export interface Options {
     allows?: string[];
 }
 
+const replaceTxt = (text: string) => {
+    const trimmed = text.trim()
+    if (trimmed === "(") return "（"
+    else if (trimmed === ")") return "）"
+    else throw new Error("Unexpected string")
+}
+
 const reporter: TextlintRuleModule<Options> = (context, options = {}) => {
     const { Syntax, RuleError, fixer, report, getSource, locator } = context;
     const allows = options.allows ?? [];
@@ -13,15 +20,17 @@ const reporter: TextlintRuleModule<Options> = (context, options = {}) => {
             const text = getSource(node); // Get text
             if (allows.some(allow => text.includes(allow))) return;
 
-            const matches = text.matchAll(/bugs/g);
+            const matches = text.matchAll(/(?:\s*\()|(?:\)\s*)/g);
             for (const match of matches) {
                 const index = match.index ?? 0;
-                const matchRange = [index, index + match[0].length] as const;
+                const text = match[0]
+                const matchRange = [index, index + text.length] as const;
 
-                const replace = fixer.replaceTextRange(matchRange, "fixed")
-                const ruleError = new RuleError("Found bugs.", {
+                const replacer = fixer.replaceTextRange(
+                    matchRange, replaceTxt(text))
+                const ruleError = new RuleError("括弧は半角ではなく、全角を使用してください。", {
                     padding: locator.range(matchRange),
-                    fix: replace
+                    fix: replacer
                 });
                 report(node, ruleError);
             }

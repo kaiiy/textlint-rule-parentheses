@@ -5,36 +5,74 @@ const tester = new TextLintTester();
 // ruleName, rule, { valid, invalid }
 tester.run("rule", rule, {
     valid: [
-        // no problem
+        "（",
         "text",
-        {
-            text: "It is bugs, but it should be ignored",
-            options: {
-                allows: ["it should be ignored"]
-            }
-        },
+        "）"
     ],
     invalid: [
-        // single match
         {
-            text: "It is bugs.",
+            text: "(",
             errors: [
                 {
-                    message: "Found bugs.",
-                    range: [6, 10]
+                    range: [0, 1]
                 }
             ],
-            output: "It is fixed."
+            output: "（"
         },
-        // multiple match
         {
-            text: "It has many bugs. One more bugs",
+            text: ")",
             errors: [
                 {
-                    range: [12, 16]
+                    range: [0, 1]
+                }
+            ],
+            output: "）"
+        },
+        {
+            text: "９     (",
+            errors: [
+                {
+                    range: [1, 7]
+                }
+            ],
+            output: "９（"
+        },
+        {
+            text: ")    ま",
+            errors: [
+                {
+                    range: [0, 5]
+                }
+            ],
+            output: "）ま"
+        },
+        {
+            text: "()((",
+            errors: [
+                {
+                    range: [0, 1]
                 },
                 {
-                    range: [27, 31]
+                    range: [1, 2]
+                },
+                {
+                    range: [2, 3]
+                },
+                {
+                    range: [3, 4]
+                }
+            ],
+            output: "（）（（"
+        },
+        {
+            text: "s   (tex   t )  s",
+            output: "s（tex   t ）s",
+            errors: [
+                {
+                    range: [1, 5]
+                },
+                {
+                    range: [13, 16]
                 }
             ],
         },
