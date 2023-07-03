@@ -1,6 +1,6 @@
 # textlint-rule-parentheses
 
-
+[![test](https://github.com/kaiiy/textlint-rule-parentheses/actions/workflows/test.yml/badge.svg?branch=main)](https://github.com/kaiiy/textlint-rule-parentheses/actions/workflows/test.yml)
 
 ## Install
 
